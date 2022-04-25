@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pokemon</title>
+    <style>
+      #navbar {
+        display: flex;
+        justify-content: flex-end;
+        background: #212121;
+        height: 60px;
+        position: fixed;
+        top: 0;
+        width: 100%;
+      }
+      #navbar #search {
+        padding: 8px 13px;
+        border: none;
+        border-bottom: 1px solid #212121;
+        /* margin-right:50px; */
+        width: 20%;
+        height: 40px;
+        margin: auto;
+        border-radius: 5px;
+        outline: none;
+      }
+      #container {
+        display: flex;
+        justify-content: space-evenly;
+      }
+      #container1 {
+        width: 50%;
+        margin-top: 90px;
+        margin-left: 80px;
+      }
+      #container2 {
+        width: 50%;
+        margin-top: 80px;
+      }
+      #container2 div {
+      
+        border-radius: 5px;
+        width: 350px;
+        height: 350px;
+      }
+      table,
+      thead,
+      td {
+        border: 1px solid #cecece;
+      }
+      td {
+        padding-top: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="navbar">
+      <input type="search" placeholder="enter pokemon's name" id="search" />
+    </div>
+    <div id="container">
+      <div id="container1">
+        <table>
+          <thead>
+            <tr>
+              <th>Pokemons</th>
+            </tr>
+          </thead>
+
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <div id="container2"></div>
+    </div>
+  </body>
+  <script>
+    // part-1
+    fetch(`https://pokeapi.co/api/v2/pokemon`)
+      .then(function (response) {
+        response.json().then((pokemons) => {
+          let pokemonsData = pokemons.results;
+          console.log(pokemonsData);
+          localStorage.setItem("POKEMON", JSON.stringify(pokemonsData));
+          displayPokemons(pokemonsData);
+        });
+      })
+      .catch(function (error) {
+        console.log("Error", error);
+      });
+
+    function displayPokemons(pokemonData) {
+      document.getElementById("tbody").innerHTML = "";
+
+      pokemonData.forEach((pokemon) => {
+        let trow = document.createElement("tr");
+
+        let td = document.createElement("td");
+        td.innerText = pokemon.name;
+
+        trow.append(td);
+
+        document.getElementById("tbody").append(trow);
+      });
+    }
+
+    let pokemonStorage = JSON.parse(localStorage.getItem("POKEMON"));
+    displayPokemons(pokemonStorage);
+
+    // part-2
+
+    document.getElementById("search").addEventListener("search", () => {
+      let pokemonName = document.getElementById("search").value;
+
+      fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`)
+        .then(function (response) {
+          response.json().then((results) => {
+            console.log(results);
+            displayPokemonCard([results]);
+          });
+        })
+        .catch(function (error) {
+          console.log("Error", error);
+        });
+    });
+
+    function displayPokemonCard(pokemonsResult) {
+      pokemonsResult.forEach((pokemon) => {
+        let card = document.createElement("div");
+
+        let id = document.createElement("p");
+        id.innerText = pokemon.id;
+
+        let name = document.createElement("p");
+        name.innerText = pokemon.name;
+
+        let height = document.createElement("p");
+        height.innerText = pokemon.height;
+
+        let weight = document.createElement("p");
+        weight.innerText = pokemon.weight;
+
+        let abilitiesDiv = document.createElement("div");
+        pokemon.abilities.forEach((abilities) => {
+          let a = abilities.ability.name;
+          abilitiesDiv.append(a);
+        });
+
+        let movesDiv = document.createElement("div");
+        pokemon.moves.forEach((moves) => {
+          let m = moves.move.name;
+          movesDiv.append(m);
+        });
+
+        card.append(id, name, height, weight, abilitiesDiv, movesDiv);
+
+        document.getElementById("container2").append(card);
+      });
+    }
+  </script>
+</html>
