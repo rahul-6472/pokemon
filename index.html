@@ -126,6 +126,7 @@
     });
 
     function displayPokemonCard(pokemonsResult) {
+      document.getElementById("container2").innerHTML = ""
       pokemonsResult.forEach((pokemon) => {
         let card = document.createElement("div");
 
